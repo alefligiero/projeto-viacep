@@ -1,5 +1,6 @@
 import Address from "../models/address.js";
 import * as addressService from "../services/address-service.js"
+import * as listController from "../controllers/list-controller.js";
 
 function State() {
 
@@ -42,7 +43,18 @@ export function init() {
 
 async function handleBtnSaveClick(event) {
     event.preventDefault();
-    console.log(state.address);
+
+    const errors = addressService.getErrors(state.address);
+    const keys = Object.keys(errors);
+
+    if (keys.length > 0) {
+        keys.forEach(key => {
+            setFormError(key, errors[key]);
+        });
+    } else {
+        listController.addCard(state.address);
+        clearForm();
+    }
 }
 
 function handleInputNumberKeyUp(event) {
@@ -90,6 +102,8 @@ function clearForm() {
 
     setFormError("cep", "");
     setFormError("number", "");
+
+    state.address = new Address();
 
     state.inputCep.focus();
 }
